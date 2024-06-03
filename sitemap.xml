@@ -4,34 +4,25 @@
   <url>
     <loc>http://wyh-7.github.io/manifest.json</loc>
     
-    <lastmod>2024-05-26</lastmod>
+    <lastmod>2024-06-03</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://wyh-7.github.io/posts/9520.html</loc>
+    <loc>http://wyh-7.github.io/posts/3c50d03d.html</loc>
     
-    <lastmod>2024-05-26</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://wyh-7.github.io/posts/4a17b156.html</loc>
-    
-    <lastmod>2024-05-26</lastmod>
+    <lastmod>2024-06-03</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://wyh-7.github.io/posts/dfb8a81f.html</loc>
+    <loc>http://wyh-7.github.io/posts/7b7eec0b.html</loc>
     
-    <lastmod>2024-05-26</lastmod>
+    <lastmod>2024-06-03</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -40,15 +31,15 @@
 
   <url>
     <loc>http://wyh-7.github.io/</loc>
-    <lastmod>2024-05-26</lastmod>
+    <lastmod>2024-06-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   
   <url>
-    <loc>http://wyh-7.github.io/tags/%E7%94%9F%E6%B4%BB/</loc>
-    <lastmod>2024-05-26</lastmod>
+    <loc>http://wyh-7.github.io/tags/Markdown/</loc>
+    <lastmod>2024-06-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>

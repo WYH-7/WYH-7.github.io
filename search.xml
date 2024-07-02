@@ -4,6 +4,45 @@
   
     
     <entry>
+      <title>杂项</title>
+      <link href="/posts/bc8ba982.html"/>
+      <url>/posts/bc8ba982.html</url>
+      
+        <content type="html"><![CDATA[<h3 id="js文件中export-default和export"><a href="#js文件中export-default和export" class="headerlink" title="js文件中export default和export"></a>js文件中export default和export</h3><p>在一个js文件中，export default和export都可以用来导出内容，但它们之间有一些区别：<br>export default只能有一个默认导出，而export可以有多个命名导出。默认导出可以在导入时指定任意名称，而命名导出需要使用相同的名称。</p><p>例如，以下是使用export default导出默认函数的示例：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// utils.js</span><br><span class="line">function add(a, b) &#123;</span><br><span class="line">  return a + b;</span><br><span class="line">&#125;</span><br><span class="line">export default add;</span><br></pre></td></tr></table></figure></p><p>在另一个文件中导入默认函数的方式：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// app.js</span><br><span class="line">import myAdd from &#x27;./utils.js&#x27;;</span><br><span class="line"></span><br><span class="line">console.log(myAdd(2, 3)); // 输出: 5</span><br></pre></td></tr></table></figure><p>当使用export default时，在导入时可以使用import语句的一个额外的语法糖。例如，可以省略导入的内容的花括号。<br>例如，以下是使用export default导出默认函数，并在导入时省略花括号的示例：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// utils.js</span><br><span class="line">function add(a, b) &#123;</span><br><span class="line">  return a + b;</span><br><span class="line">&#125;</span><br><span class="line">export default add;</span><br></pre></td></tr></table></figure><br>在另一个文件中导入默认函数的方式：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// app.js</span><br><span class="line">import myAdd from &#x27;./utils.js&#x27;;</span><br><span class="line"></span><br><span class="line">console.log(myAdd(2, 3)); // 输出: 5</span><br></pre></td></tr></table></figure></p><h3 id="插槽Slots"><a href="#插槽Slots" class="headerlink" title="插槽Slots"></a>插槽Slots</h3><p>为子组件传递一些模板片段，让子组件在它们的组件中渲染这些片段。</p><p>举例来说，这里有一个 <FancyButton> 组件，可以像这样使用：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;<span class="title class_">FancyButton</span>&gt;</span><br><span class="line">  <span class="title class_">Click</span> me! &lt;!-- 插槽内容 --&gt;</span><br><span class="line">&lt;/<span class="title class_">FancyButton</span>&gt;</span><br></pre></td></tr></table></figure><br>而 <FancyButton> 的模板是这样的：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;button <span class="keyword">class</span>=<span class="string">&quot;fancy-btn&quot;</span>&gt;</span><br><span class="line">  <span class="language-xml"><span class="tag">&lt;<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span> &lt;!-- 插槽出口 --&gt;</span><br><span class="line">&lt;/button&gt;</span><br></pre></td></tr></table></figure></p><blockquote><p><slot> 元素是一个插槽出口 (slot outlet)，标示了父元素提供的插槽内容 (slot content) 将在哪里被渲染。<br><img src="../png/image.png" alt="alt text"></p></blockquote><p>最终渲染出的 DOM 是这样：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">class</span>=<span class="string">&quot;fancy-btn&quot;</span>&gt;</span>Click me!<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure></p><p><a href="https://cn.vuejs.org/guide/components/slots.html">插槽</a></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>注解</title>
+      <link href="/posts/a70f4376.html"/>
+      <url>/posts/a70f4376.html</url>
+      
+        <content type="html"><![CDATA[<h3 id="validated"><a href="#validated" class="headerlink" title="@validated"></a>@validated</h3><blockquote><p>spring-boot中可以用@validated来校验数据，如果数据异常则会统一抛出异常，方便异常中心统一处理。<br><a href="https://blog.csdn.net/u010349272/article/details/107520021">参考文章</a></p></blockquote>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>netty</title>
+      <link href="/posts/ddaa8ce6.html"/>
+      <url>/posts/ddaa8ce6.html</url>
+      
+        <content type="html"><![CDATA[<h3 id="netty"><a href="#netty" class="headerlink" title="netty"></a>netty</h3>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>auth配置</title>
       <link href="/posts/6c0e9f3b.html"/>
       <url>/posts/6c0e9f3b.html</url>

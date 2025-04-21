@@ -1,0 +1,498 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>MQ | WYH</title><meta name="author" content="WYH"><meta name="copyright" content="WYH"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="⚫ 熟悉Rocketmq的使用，掌握持久化机制，消息可靠性，延迟消费等，解决过消息积压，消息逆序等问题； 使用场景（系统解耦和流量削峰）  异步通信场景：MQ可以实现消息的异步传递，避免了请求等待的时间，提高了系统的响应速度和吞吐量。 常见的应用场景有异步下单、异步支付等，例如在电商平台中，当用户下单或支付后，这些操作可以被转化为消息发送至MQ，由后台服务异步处理，而用户无需等待操作完成即可进行其">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MQ">
+<meta property="og:url" content="http://wyh-7.github.io/posts/186242d5.html">
+<meta property="og:site_name" content="WYH">
+<meta property="og:description" content="⚫ 熟悉Rocketmq的使用，掌握持久化机制，消息可靠性，延迟消费等，解决过消息积压，消息逆序等问题； 使用场景（系统解耦和流量削峰）  异步通信场景：MQ可以实现消息的异步传递，避免了请求等待的时间，提高了系统的响应速度和吞吐量。 常见的应用场景有异步下单、异步支付等，例如在电商平台中，当用户下单或支付后，这些操作可以被转化为消息发送至MQ，由后台服务异步处理，而用户无需等待操作完成即可进行其">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=600">
+<meta property="article:published_time" content="2025-04-21T13:27:37.000Z">
+<meta property="article:modified_time" content="2025-04-21T14:57:28.982Z">
+<meta property="article:author" content="WYH">
+<meta property="article:tag" content="MQ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=600"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://wyh-7.github.io/posts/186242d5.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="manifest" href="/manifest.json"/><meta name="msapplication-TileColor" content="#3cb371"/><link rel="apple-touch-icon" sizes="180x180" href="/img/siteicon/128.png"/><link rel="icon" type="image/png" sizes="32x32" href="/img/siteicon/32.png"/><link rel="icon" type="image/png" sizes="16x16" href="/img/siteicon/16.png"/><link rel="mask-icon" href="/img/siteicon/128.png" color="#5bbad5"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'MQ',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-04-21 22:57:28'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu@1.1.6/lib/clock.min.css" /><link rel="stylesheet" href="https://npm.elemecdn.com/anzhiyu-blog@2.0.4/css/runtime/runtime.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/assets/font-awesome-animation.min.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/tag_plugins.css" media="defer" onload="this.media='all'"><script src="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/assets/carousel-touch.js"></script><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="WYH" type="application/atom+xml">
+</head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">12</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=600')"><nav id="nav"><span id="blog-info"><a href="/" title="WYH"><span class="site-name">WYH</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">MQ</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-04-21T13:27:37.000Z" title="发表于 2025-04-21 21:27:37">2025-04-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-04-21T14:57:28.982Z" title="更新于 2025-04-21 22:57:28">2025-04-21</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="MQ"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>⚫ 熟悉Rocketmq的使用，掌握持久化机制，消息可靠性，延迟消费等，解决过消息积压，消息逆序等问题；</p>
+<h1 id="使用场景（系统解耦和流量削峰）"><a href="#使用场景（系统解耦和流量削峰）" class="headerlink" title="使用场景（系统解耦和流量削峰）"></a>使用场景（系统解耦和流量削峰）</h1><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/186242d5/image-20250421215648224.png" alt="image-20250421215648224"></p>
+<blockquote>
+<h3 id="异步通信场景："><a href="#异步通信场景：" class="headerlink" title="异步通信场景："></a>异步通信场景：</h3><p>MQ可以实现消息的异步传递，避免了请求等待的时间，提高了系统的响应速度和吞吐量。</p>
+<p>常见的应用场景有<strong>异步下单、异步支付</strong>等，例如在电商平台中，当用户下单或支付后，这些操作可以被转化为消息发送至MQ，由后台服务异步处理，而用户无需等待操作完成即可进行其他操作。</p>
+<h3 id="分布式系统场景："><a href="#分布式系统场景：" class="headerlink" title="分布式系统场景："></a>分布式系统场景：</h3><p>MQ可以在分布式系统中实现各个节点之间的高效通信，解决网络延迟、网络抖动等问题。</p>
+<p>常见的应用场景有<strong>分布式任务调度、分布式事务</strong>等。例如，在微服务架构中，服务之间的数据交互可以通过MQ实现，降低服务的耦合度，提高系统的可扩展性和可维护性。</p>
+<h3 id="解耦系统场景："><a href="#解耦系统场景：" class="headerlink" title="解耦系统场景："></a>解耦系统场景：</h3><p>MQ可以将系统各个模块之间的耦合度降低，实现系统的解耦。</p>
+<p>常见的应用场景有<strong>日志收集、异常监控</strong>等。通过使用MQ，可以将这些操作从主业务逻辑中分离出来，降低系统的复杂性。</p>
+<h3 id="流量削峰场景："><a href="#流量削峰场景：" class="headerlink" title="流量削峰场景："></a>流量削峰场景：</h3><p>MQ可以在高并发场景下，实现流量的削峰，避免系统崩溃或响应变慢。</p>
+<p>常见的应用场景有<strong>秒杀、活动抢购</strong>等。通过使用MQ缓存请求，后台服务可以按顺序处理，避免大量请求直接冲击系统。</p>
+<h3 id="消息通知场景："><a href="#消息通知场景：" class="headerlink" title="消息通知场景："></a>消息通知场景：</h3><p>MQ可以实现消息的实时通知，提高用户体验。</p>
+<p>常见的应用场景有<strong>订单状态变更通知、短信验证码发送</strong>等。用户可以在无需主动查询的情况下，实时获取到最新的信息。</p>
+<h3 id="数据同步场景："><a href="#数据同步场景：" class="headerlink" title="数据同步场景："></a>数据同步场景：</h3><p>MQ可以实现不同系统之间数据的同步，保证数据的一致性。</p>
+<p>常见的应用场景有<strong>缓存同步、库存同步</strong>等。当某个系统修改了共享数据后，可以通过MQ通知其他系统同步数据。</p>
+</blockquote>
+<h1 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h1><blockquote>
+<h3 id="系统复杂性增加"><a href="#系统复杂性增加" class="headerlink" title="系统复杂性增加"></a>系统复杂性增加</h3><p>引入消息队列会增加系统的复杂性，包括系统架构、开发和运维的复杂性。需要处理消息的生产、消费、路由、持久化、重试、重复消息处理等问题。</p>
+<p>在一个简单的单体应用中，引入消息队列需要重新设计系统架构，并且需要开发和维护消息生产者和消费者代码，这增加了系统的复杂性。</p>
+<h3 id="消息丢失风险"><a href="#消息丢失风险" class="headerlink" title="消息丢失风险"></a>消息丢失风险</h3><p>尽管大多数消息队列系统提供了消息持久化和重试机制，但在极端情况下（如硬件故障、网络故障等），仍然存在消息丢失的风险。</p>
+<p>在网络分区或硬盘故障的情况下，消息可能会丢失，导致系统无法处理某些关键操作，如订单处理中的支付请求。</p>
+<h3 id="消息重复"><a href="#消息重复" class="headerlink" title="消息重复"></a>消息重复</h3><p>由于网络故障或消费者处理失败，消息队列系统可能会重发消息，这会导致消息重复。消费者需要具备<strong>幂等性</strong>，能够正确处理重复消息。</p>
+<p>在支付系统中，如果支付请求被重复处理，可能会导致用户被多次扣款。因此，消费者需要确保每个支付请求只被处理一次。</p>
+<h3 id="延迟"><a href="#延迟" class="headerlink" title="延迟"></a>延迟</h3><p>消息队列引入了额外的网络传输和排队时间，这可能会导致消息处理的延迟。对于某些实时性要求高的系统，这可能是一个问题。</p>
+<p>在实时交易系统中，消息处理的延迟可能会影响交易的及时性和准确性，进而影响用户体验和系统的可靠性。</p>
+<h3 id="运维成本"><a href="#运维成本" class="headerlink" title="运维成本"></a>运维成本</h3><p>消息队列系统需要专门的运维和监控，确保其高可用性和性能。这包括<strong>集群管理、节点监控、日志分析、性能调优</strong>等。</p>
+<p>Kafka、RabbitMQ 等消息队列系统需要专门的运维人员进行日常管理和维护，包括<strong>集群的扩展、故障处理、性能调优</strong>等。</p>
+<h3 id="一致性问题"><a href="#一致性问题" class="headerlink" title="一致性问题"></a>一致性问题</h3><p>在分布式系统中，使用消息队列可能会导致<strong>数据一致性问题</strong>。需要设计合理的事务管理和一致性保障机制。</p>
+<p>在订单系统中，订单创建和库存扣减需要保证一致性。如果订单创建成功但库存扣减失败，可能会导致数据不一致，需要设计<strong>补偿机制</strong>来处理这种情况。</p>
+</blockquote>
+<h1 id="常见问题与解决方案"><a href="#常见问题与解决方案" class="headerlink" title="常见问题与解决方案"></a>常见问题与解决方案</h1><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/186242d5/image-20250421215632260.png" alt="image-20250421215632260"></p>
+<h1 id="保障消息的顺序消费"><a href="#保障消息的顺序消费" class="headerlink" title="保障消息的顺序消费"></a>保障消息的顺序消费</h1><blockquote>
+<h3 id="消息顺序消费问题的原因"><a href="#消息顺序消费问题的原因" class="headerlink" title="消息顺序消费问题的原因"></a>消息顺序消费问题的原因</h3><p><strong>1、 多个消费者并行处理</strong>：当多个消费者并行处理消息时，消息的处理顺序可能会与发送顺序不一致。</p>
+<p><strong>2、 分区机制</strong>：在分布式消息队列系统中，消息通常会被分区存储和处理。不同分区内的消息顺序可能会被打乱。</p>
+<p><strong>3、 重试机制</strong>：消息处理失败时，重试机制可能会导致消息顺序被打乱。</p>
+<h3 id="解决消息顺序消费问题的方案"><a href="#解决消息顺序消费问题的方案" class="headerlink" title="解决消息顺序消费问题的方案"></a>解决消息顺序消费问题的方案</h3><p><strong>使用顺序队列</strong>:顺序队列确保消息按照发送的顺序进行处理。常见的消息队列系统，如Kafka、RabbitMQ等，都支持顺序队列。 在Kafka中，可以通过使用单个分区来保证消息的顺序性。因为同一个分区内的消息是按顺序存储和处理的。其他消息队列也有响应的机制。</p>
+<p><strong>使用消息分区键</strong>:通过设置消息分区键，确保同一分区内的消息按顺序处理。分区键通常是业务相关的标识符，如订单ID、用户ID等。 在Kafka中，可以使用分区键来确保同一订单的消息发送到同一分区。</p>
+<p><strong>单消费者模式</strong>：在某些情况下，可以使用单消费者模式，即一个队列只有一个消费者。这样可以确保消息按顺序处理。 在RabbitMQ中，可以配置队列为单消费者模式。</p>
+<p><strong>消息排序</strong>：在某些场景中，可以在消费端进行消息排序。消费者在处理消息前，对消息进行排序，确保处理顺序。这种场景其实实际很难使用，因为你不知道消息多少，比较适合固定时间内的批量处理，可以排序。</p>
+</blockquote>
+<h1 id="避免消息丢失"><a href="#避免消息丢失" class="headerlink" title="避免消息丢失"></a>避免消息丢失</h1><blockquote>
+<h3 id="消息生产过程中的可靠性保证"><a href="#消息生产过程中的可靠性保证" class="headerlink" title="消息生产过程中的可靠性保证:"></a>消息生产过程中的可靠性保证:</h3><p><strong>确保</strong>消息被<strong>成功发送</strong>到消息队列系统。<strong>比如 Kafka</strong>：使用acks配置，设置为all，确保消息被所有副本确认。<strong>RabbitMQ</strong> 则使用publisher confirms，确保消息被队列接收。</p>
+<h3 id="消息传输过程中的可靠性保证"><a href="#消息传输过程中的可靠性保证" class="headerlink" title="消息传输过程中的可靠性保证"></a>消息传输过程中的可靠性保证</h3><p>在网络传输失败时进行<strong>重试</strong>。同时使用 <strong>TCP</strong>，确保消息传输的可靠性。 </p>
+<h3 id="消息存储过程中的可靠性保证"><a href="#消息存储过程中的可靠性保证" class="headerlink" title="消息存储过程中的可靠性保证"></a>消息存储过程中的可靠性保证</h3><p><strong>确保</strong>消息在磁盘上<strong>持久化存储</strong>。<strong>Kafka</strong>默认情况下消息是持久化存储的。<strong>RabbitMQ</strong> 则需要设置队列和消息为持久化。 在RabbitMQ中设置持久化：</p>
+<h3 id="消息消费过程中的可靠性保证"><a href="#消息消费过程中的可靠性保证" class="headerlink" title="消息消费过程中的可靠性保证"></a>消息消费过程中的可靠性保证</h3><p><strong>消息确认机制（Consumer Acknowledgment）</strong>：确保消息被成功处理后才从队列中删除。比如 <strong>Kafka</strong>使用手动提交偏移量。<strong>RabbitMQ</strong> 则使用手动确认机制（manual acknowledgment）。</p>
+<h3 id="其他注意事项"><a href="#其他注意事项" class="headerlink" title="其他注意事项"></a>其他注意事项</h3><p><strong>1、 监控和报警</strong>：实时监控消息队列系统的运行状态，设置报警机制，及时发现和处理消息丢失问题。</p>
+<p><strong>2、 日志记录</strong>：记录消息的生产、传输、存储和消费日志，便于问题排查和恢复。</p>
+<p><strong>3、 消息重试机制</strong>：配置合理的消息重试机制，确保在处理失败时进行重试。</p>
+<p><strong>4、 高可用部署</strong>：部署高可用集群，确保在节点故障时系统能够自动切换，避免消息丢失。</p>
+</blockquote>
+<h1 id="避免消息重复投递或重复消费"><a href="#避免消息重复投递或重复消费" class="headerlink" title="避免消息重复投递或重复消费"></a>避免消息重复投递或重复消费</h1><blockquote>
+<h3 id="消息幂等性"><a href="#消息幂等性" class="headerlink" title="消息幂等性"></a>消息幂等性</h3><p>消息幂等性是指<strong>无论消息被处理多少次，结果都是相同的</strong>。实现幂等性是避免重复消费的基础。</p>
+<p>主要可以通过如下方式进行实现：</p>
+<p><strong>1、 唯一标识</strong>：每条消息都带有一个唯一标识（如 UUID），在处理消息时，先检查这个标识是否已经处理过。</p>
+<p><strong>2、 去重表</strong>：使用数据库或缓存系统（如 Redis）记录处理过的消息标识，避免重复处理。</p>
+<p><strong>3、 业务逻辑幂等性</strong>：确保业务操作本身是幂等的，例如扣款操作确保同一笔交易不会被重复扣款。</p>
+<h3 id="消息投递机制"><a href="#消息投递机制" class="headerlink" title="消息投递机制"></a>消息投递机制</h3><p>RocketMQ 支持多种消息投递机制，可以根据业务需求选择合适的投递策略。</p>
+<p><strong>同步投递</strong>确保消息被可靠地发送到 Broker，并且发送方可以收到确认。通过这种方式，可以减少消息丢失的可能性。</p>
+<p>RocketMQ 提供了消息重试机制，当消息投递失败时，会自动重试。为了避免重复投递，可以设置合理的重试次数和间隔时间。</p>
+<h3 id="消费进度管理"><a href="#消费进度管理" class="headerlink" title="消费进度管理"></a>消费进度管理</h3><p>消费进度管理是避免重复消费的关键。RocketMQ 通过<strong>消费位点（Offset</strong>）来管理消费进度。</p>
+<p>消费者实例在消费消息后，需要定期提交消费位点到 Broker。这样即使消费者实例重启，也能从上次提交的位置继续消费。</p>
+<p>消费位点可以存储在 Broker 或外部存储系统（如数据库、Zookeeper）中。确保<strong>消费位点的持久化存储</strong>，可以在消费者实例故障恢复后继续消费。</p>
+</blockquote>
+<h1 id="消息重复消费的原因"><a href="#消息重复消费的原因" class="headerlink" title="消息重复消费的原因"></a>消息重复消费的原因</h1><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/186242d5/image-20250421221045345.png" alt="image-20250421221045345"></p>
+<h1 id="死信队列和延迟队列"><a href="#死信队列和延迟队列" class="headerlink" title="死信队列和延迟队列"></a>死信队列和延迟队列</h1><blockquote>
+<h3 id="死信队列（DLQ）"><a href="#死信队列（DLQ）" class="headerlink" title="死信队列（DLQ）"></a>死信队列（DLQ）</h3><p>死信队列用于存储那些无法被正常处理的消息。这些消息被称为“死信消息”。消息进入死信队列的原因通常包括：</p>
+<p>1、消息被<strong>消费多次但仍然处理失败</strong>。</p>
+<p>2、消息在队列中<strong>存活时间超过了最大时间限制</strong>。</p>
+<p>3、消息<strong>被拒绝</strong>（例如，消费者明确拒绝处理该消息）。</p>
+<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h4><p><strong>错误处理</strong>：当消息处理失败多次后，将其放入死信队列，可以进行后续的人工干预或特殊处理。</p>
+<p><strong>监控和报警</strong>：通过监控死信队列，可以发现系统中的异常情况，及时进行报警和处理。</p>
+<p><strong>消息审计</strong>：对死信队列中的消息进行审计，分析系统中可能存在的问题。</p>
+<h4 id="实现方法"><a href="#实现方法" class="headerlink" title="实现方法"></a>实现方法</h4><p><strong>配置死信策略</strong>：在消息队列系统中配置死信策略，如最大重试次数、消息存活时间等。</p>
+<p><strong>专用死信队列</strong>：为每个队列配置一个专用的死信队列，存储无法处理的消息。</p>
+<p><strong>消费者处理</strong>：设置专门的消费者处理死信队列中的消息，进行日志记录、报警或其他处理。</p>
+<h3 id="延迟队列"><a href="#延迟队列" class="headerlink" title="延迟队列"></a>延迟队列</h3><p>延迟队列用于存储那些需要<strong>在指定时间后才能被消费的消息</strong>。消息在发送到延迟队列后，会在设定的延迟时间到达后才被投递到目标队列供消费者消费。</p>
+<h4 id="使用场景-1"><a href="#使用场景-1" class="headerlink" title="使用场景"></a>使用场景</h4><p><strong>定时任务</strong>：实现定时任务调度，如在指定时间发送通知、执行任务等。</p>
+<p><strong>重试机制</strong>：在消息处理失败后，将消息放入延迟队列，等待一段时间后再重新处理。</p>
+<h4 id="实现方法-1"><a href="#实现方法-1" class="headerlink" title="实现方法"></a>实现方法</h4><p><strong>消息定时属性</strong>：为消息设置定时属性，如延迟时间、到期时间等。</p>
+<p><strong>时间轮算法</strong>：使用时间轮算法管理延迟消息，定时检查并将到期的消息投递到目标队列。</p>
+</blockquote>
+<h1 id="解决消息队列的延时以及过期失效问题"><a href="#解决消息队列的延时以及过期失效问题" class="headerlink" title="解决消息队列的延时以及过期失效问题"></a>解决消息队列的延时以及过期失效问题</h1><blockquote>
+<h3 id="解决消息队列的延时问题"><a href="#解决消息队列的延时问题" class="headerlink" title="解决消息队列的延时问题"></a>解决消息队列的延时问题</h3><p><strong>1、增加消费者实例：</strong>增加消费者实例可以提高消息处理的并发度，从而减少消息的等待时间。</p>
+<p><strong>2、优化消费者处理逻辑：</strong>优化消费者的处理逻辑，减少每条消息的处理时间。例如，通过批量处理、异步处理、减少不必要的计算和 I/O 操作等方式来提高处理效率。</p>
+<p><strong>3、调整消息队列的分区：</strong>增加消息队列的分区数，使更多的消费者能够并行处理消息，从而提高处理速度。</p>
+<p><strong>4、 调整消息队列的配置：</strong>调整消息队列的配置参数，如增加内存缓冲区大小、优化网络配置等，以减少消息传输和处理的延时。</p>
+<h3 id="解决消息过期失效问题"><a href="#解决消息过期失效问题" class="headerlink" title="解决消息过期失效问题"></a>解决消息过期失效问题</h3><p><strong>1、 设置合理的消息过期时间：</strong>根据业务需求设置合理的消息过期时间，确保消息在有效期内被处理。</p>
+<p><strong>2、 使用死信队列（DLQ）：</strong>将处理失败或过期的消息转移到死信队列，进行后续处理或人工干预。</p>
+</blockquote>
+<h1 id="解决消息积压的问题"><a href="#解决消息积压的问题" class="headerlink" title="解决消息积压的问题"></a>解决消息积压的问题</h1><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/186242d5/image-20250421221444093.png" alt="image-20250421221444093"></p>
+<h1 id="Kafka、ActiveMQ、RabbitMQ、RocketMQ有什么优缺点"><a href="#Kafka、ActiveMQ、RabbitMQ、RocketMQ有什么优缺点" class="headerlink" title="Kafka、ActiveMQ、RabbitMQ、RocketMQ有什么优缺点"></a>Kafka、ActiveMQ、RabbitMQ、RocketMQ有什么优缺点</h1><blockquote>
+<h3 id="Apache-Kafka"><a href="#Apache-Kafka" class="headerlink" title="Apache Kafka"></a>Apache Kafka</h3><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ol>
+<li><strong>高吞吐量</strong>：Kafka 设计用于处理高吞吐量的实时数据流，能够处理数百万条消息每秒。</li>
+<li><strong>持久化和可靠性</strong>：消息被持久化到磁盘，并且可以配置副本机制，保证消息的高可用性和可靠性。</li>
+<li><strong>水平扩展</strong>：Kafka 的分区机制允许其轻松扩展，增加更多的代理（broker）来处理更多的数据。</li>
+</ol>
+<h4 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h4><ol>
+<li><strong>复杂的运维</strong>：Kafka 的部署和运维相对复杂，需要专门的运维人员来管理和监控 Kafka 集群。</li>
+<li><strong>高延迟</strong>：相对于内存中消息传递的系统，Kafka 的磁盘 I/O 操作会带来一定的延迟。</li>
+<li><strong>功能单一</strong>：Kafka 专注于高吞吐量和持久化，但在消息路由、优先级队列等高级特性上不如其他消息队列。</li>
+</ol>
+<h3 id="ActiveMQ"><a href="#ActiveMQ" class="headerlink" title="ActiveMQ"></a>ActiveMQ</h3><h4 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h4><ol>
+<li><strong>丰富的特性</strong>：支持多种消息传递模型（点对点、发布-订阅）、消息持久化、事务、消息优先级、延迟消息等高级特性。</li>
+<li><strong>多协议支持</strong>：支持多种协议（如 AMQP、MQTT、STOMP、OpenWire 等），灵活性高。</li>
+<li><strong>简单易用</strong>：相对容易部署和使用，适合中小型企业和应用。</li>
+</ol>
+<h4 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h4><ol>
+<li><strong>性能瓶颈</strong>：在高吞吐量和高并发场景下，ActiveMQ 的性能较 Kafka 和 RocketMQ 略显不足。</li>
+<li><strong>扩展性有限</strong>：虽然支持集群模式，但扩展性和水平扩展能力不如 Kafka 和 RocketMQ。</li>
+</ol>
+<h3 id="RabbitMQ"><a href="#RabbitMQ" class="headerlink" title="RabbitMQ"></a>RabbitMQ</h3><h4 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h4><ol>
+<li><strong>灵活的路由机制</strong>：RabbitMQ 提供了复杂的消息路由机制（如交换器、绑定键、队列），支持多种消息传递和路由模式。</li>
+<li><strong>多协议支持</strong>：支持 AMQP、MQTT、STOMP 等多种协议，适用性广。</li>
+<li><strong>可靠性高</strong>：支持消息持久化、确认机制、事务等，保证消息的可靠传递。</li>
+</ol>
+<h4 id="缺点-3"><a href="#缺点-3" class="headerlink" title="缺点"></a>缺点</h4><ol>
+<li><strong>性能限制</strong>：在极高吞吐量和低延迟场景下，RabbitMQ 的性能不如 Kafka 和 RocketMQ。</li>
+<li><strong>运维复杂度</strong>：在大规模集群中，RabbitMQ 的运维和管理相对复杂。</li>
+<li><strong>内存消耗</strong>：RabbitMQ 在处理大量消息时，内存消耗较高，需要合理配置和管理。</li>
+</ol>
+<h3 id="Apache-RocketMQ"><a href="#Apache-RocketMQ" class="headerlink" title="Apache RocketMQ"></a>Apache RocketMQ</h3><h4 id="优点-3"><a href="#优点-3" class="headerlink" title="优点"></a>优点</h4><ol>
+<li><strong>高性能</strong>：RocketMQ 设计用于高吞吐量和低延迟的消息传递，性能接近 Kafka。</li>
+<li><strong>强大的消息路由</strong>：支持复杂的消息路由和过滤机制，灵活性高。</li>
+<li><strong>分布式事务</strong>：支持分布式事务，适合需要严格事务保证的场景。</li>
+<li><strong>扩展性强</strong>：支持水平扩展，能够轻松扩展集群规模。</li>
+<li><strong>可靠性高</strong>：支持消息持久化、副本机制，保证消息的高可用性和可靠性。</li>
+</ol>
+<h4 id="缺点-4"><a href="#缺点-4" class="headerlink" title="缺点"></a>缺点</h4><ol>
+<li><strong>运维复杂度</strong>：RocketMQ 的部署和运维相对复杂，需要专业知识和经验。</li>
+</ol>
+</blockquote>
+<h1 id="RocketMQ消费模式有几种"><a href="#RocketMQ消费模式有几种" class="headerlink" title="RocketMQ消费模式有几种"></a>RocketMQ消费模式有几种</h1><blockquote>
+<h3 id="集群消费"><a href="#集群消费" class="headerlink" title="集群消费"></a>集群消费</h3><p>在集群消费模式下，<strong>多个消费者实例组成一个消费组</strong>（Consumer Group），每个消息只会被消费组中的<strong>一个</strong>消费者实例消费。这种模式适用于消息处理需要负载均衡的场景。每个消息只会被消费一次。<strong>适合需要处理大量消息的场景</strong>。</p>
+<p>假设有一个消费组GroupA，包含两个消费者实例Consumer1和Consumer2。当生产者发送消息到主题TopicA时，消息会被分配给Consumer1或Consumer2，但不会同时被两个消费者实例消费。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">graph LR  </span><br><span class="line">    TopicA --&gt; msg1  </span><br><span class="line">    TopicA --&gt; msg2  </span><br><span class="line">    msg1 --&gt; Consumer1  </span><br><span class="line">    msg2 --&gt; Consumer2  </span><br><span class="line"></span><br><span class="line">    subgraph GroupA  </span><br><span class="line">        Consumer1  </span><br><span class="line">        Consumer2  </span><br><span class="line">    end</span><br></pre></td></tr></table></figure>
+<h3 id="广播消费"><a href="#广播消费" class="headerlink" title="广播消费"></a>广播消费</h3><p>在广播消费模式下，<strong>多个消费者实例组成一个消费组</strong>，每个消息会被消费组中的<strong>所有</strong>消费者实例消费。这种模式适用于消息需要被多个消费者同时处理的场景。<strong>适合需要消息被多个消费者处理的场景</strong>，如日志处理、监控数据等。</p>
+<p>假设有一个消费组GroupB，包含两个消费者实例Consumer3和Consumer4。当生产者发送消息到主题TopicB时，消息会被Consumer3和Consumer4同时消费。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">graph LR  </span><br><span class="line">    TopicA --&gt; msg1  </span><br><span class="line">    TopicA --&gt; msg1</span><br><span class="line">    msg1 --&gt; msg2  </span><br><span class="line">    msg1 --&gt; msg2  </span><br><span class="line">    msg2 --&gt; Consumer3</span><br><span class="line">    msg2 --&gt; Consumer4</span><br><span class="line">    subgraph GroupB  </span><br><span class="line">        Consumer3  </span><br><span class="line">        Consumer4  </span><br><span class="line">    end</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h1 id="RocketMQ如何保证消息不丢失"><a href="#RocketMQ如何保证消息不丢失" class="headerlink" title="RocketMQ如何保证消息不丢失"></a>RocketMQ如何保证消息不丢失</h1><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/186242d5/image-20250421221934180.png" alt="image-20250421221934180"></p>
+<blockquote>
+<h3 id="消息持久化"><a href="#消息持久化" class="headerlink" title="消息持久化"></a>消息持久化</h3><p>主要是靠的<strong>刷盘机制</strong>。RocketMQ 的磁盘消息保存在磁盘上，支持<strong>同步刷盘和异步刷盘</strong>两种方式，通过刷盘机制可以确保消息在Broker宕机时不会丢失。</p>
+<p><strong>同步刷盘（SYNC_FLUSH）</strong>：消息写入后，立即同步刷盘，确保消息持久化到磁盘。同步刷盘虽然会<strong>增加延迟</strong>，但极大地提高了消息的可靠性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;flushDiskType=SYNC_FLUSH</span><br></pre></td></tr></table></figure>
+<p><strong>异步刷盘（ASYNC_FLUSH）</strong>：消息写入后，异步刷盘，性能较高，但<strong>可靠性略低</strong>于同步刷盘。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;flushDiskType=ASYNC_FLUSH</span><br></pre></td></tr></table></figure>
+<h3 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h3><p>RocketMQ 支持主从复制，通过将消息从主节点复制到从节点来提高消息的可靠性。主节点负责<strong>写入和读取</strong>，从节点负责<strong>复制数据</strong>。</p>
+<p><strong>同步复制（SYNC_MASTER）</strong>：消息写入主节点后，立即同步复制到从节点，确保消息在主从节点都存在。同步复制提高了消息的可靠性，但会增加写入延迟。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;brokerRole=SYNC_MASTER</span><br></pre></td></tr></table></figure>
+<p><strong>异步复制（ASYNC_MASTER）</strong>：消息写入主节点后，异步复制到从节点，性能较高，但可靠性略低于同步复制。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;brokerRole=ASYNC_MASTER</span><br></pre></td></tr></table></figure>
+<h3 id="消息确认机制"><a href="#消息确认机制" class="headerlink" title="消息确认机制"></a>消息确认机制</h3><p>RocketMQ 提供了消息确认机制，确保消息被消费者成功处理。</p>
+<p><strong>消费者确认</strong>：消费者处理完消息后，向 RocketMQ 发送确认（ack）。如果消费者未确认消息（如消费者崩溃），RocketMQ 会将消息重新投递给其他消费者。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt;<span class="comment">// 消费者处理消息</span></span><br><span class="line">&gt;consumer.registerMessageListener(newMessageListenerConcurrently() &#123;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="keyword">public</span> ConsumeConcurrentlyStatus <span class="title function_">consumeMessage</span><span class="params">(List&lt;MessageExt&gt; msgs, ConsumeConcurrentlyContext context)</span> &#123;</span><br><span class="line">       <span class="comment">// 处理消息逻辑</span></span><br><span class="line">       <span class="keyword">return</span> ConsumeConcurrentlyStatus.CONSUME_SUCCESS; <span class="comment">// 处理成功</span></span><br><span class="line">   &#125;</span><br><span class="line">&gt;&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="重试机制"><a href="#重试机制" class="headerlink" title="重试机制"></a>重试机制</h3><p>RocketMQ 提供了消息重试机制，确保消息在处理失败时不会丢失。</p>
+<p><strong>生产者重试</strong>：生产者在消息发送失败时，可以进行重试，确保消息成功发送。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;producer.setRetryTimesWhenSendFailed(<span class="number">3</span>); <span class="comment">// 设置重试次数</span></span><br></pre></td></tr></table></figure>
+<p><strong>消费者重试</strong>：消费者在处理消息失败时，RocketMQ 会自动进行重试，直到消息被成功处理或达到最大重试次数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;consumer.setMaxReconsumeTimes(<span class="number">5</span>); <span class="comment">// 设置最大重试次数</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<h1 id="RocketMQ如何做负载均衡"><a href="#RocketMQ如何做负载均衡" class="headerlink" title="RocketMQ如何做负载均衡"></a>RocketMQ如何做负载均衡</h1><blockquote>
+<h3 id="负载均衡策略"><a href="#负载均衡策略" class="headerlink" title="负载均衡策略"></a>负载均衡策略</h3><p>RocketMQ 提供了多种负载均衡策略，常用的有以下几种：</p>
+<h4 id="平均分配（AllocateMessageQueueAveragely）"><a href="#平均分配（AllocateMessageQueueAveragely）" class="headerlink" title="平均分配（AllocateMessageQueueAveragely）"></a>平均分配（AllocateMessageQueueAveragely）</h4><p>这是<strong>默认</strong>的负载均衡策略，将消息队列均匀分配给消费者组中的每个消费者实例。</p>
+<p><strong>示例：</strong> 假设有一个主题TopicA，包含 4 个消息队列Q1、Q2、Q3、Q4，消费者组GroupA中有 2 个消费者实例Consumer1和Consumer2。使用平均分配策略时，Consumer1可能会分配到Q1和Q2，而Consumer2分配到Q3和Q4。</p>
+<h4 id="按环形分配（AllocateMessageQueueByCircle）"><a href="#按环形分配（AllocateMessageQueueByCircle）" class="headerlink" title="按环形分配（AllocateMessageQueueByCircle）"></a>按环形分配（AllocateMessageQueueByCircle）</h4><p>这种策略将消息队列按<strong>顺序循环分配</strong>给消费者实例。</p>
+<p><strong>示例：</strong> 假设有 3 个消息队列Q1、Q2、Q3，消费者组中有 2 个消费者实例Consumer1和Consumer2。使用按环形分配策略时，Consumer1可能会分配到Q1和Q3，而Consumer2分配到Q2。</p>
+<h4 id="自定义分配策略"><a href="#自定义分配策略" class="headerlink" title="自定义分配策略"></a>自定义分配策略</h4><p>RocketMQ 允许用户实现自定义的负载均衡策略。用户可以通过实现<strong>AllocateMessageQueueStrategy接口</strong>，定义自己的消息队列分配逻辑。</p>
+<h3 id="负载均衡过程"><a href="#负载均衡过程" class="headerlink" title="负载均衡过程"></a>负载均衡过程</h3><p>负载均衡过程通常在以下几种情况下触发：</p>
+<p><strong>消费者实例启动</strong>：当新的消费者实例加入消费者组时，RocketMQ 会重新分配消息队列。</p>
+<p><strong>消费者实例停止</strong>：当消费者实例停止或崩溃时，RocketMQ 会重新分配该实例负责的消息队列给其他存活的消费者实例。</p>
+<p><strong>定时任务</strong>：RocketMQ 内部有定时任务定期检查和调整消息队列的分配情况，确保负载均衡的持续有效。</p>
+</blockquote>
+<h1 id="RocketMQ在分布式事务下的底层原理"><a href="#RocketMQ在分布式事务下的底层原理" class="headerlink" title="RocketMQ在分布式事务下的底层原理"></a>RocketMQ在分布式事务下的底层原理</h1><blockquote>
+<p>RocketMQ 提供了分布式事务支持，主要通过<strong>两阶段提交（Two-Phase Commit）协议</strong>来实现</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/186242d5/image-20250421222253936.png" alt="image-20250421222253936"></p>
+<h3 id="事务消息发送流程"><a href="#事务消息发送流程" class="headerlink" title="事务消息发送流程"></a>事务消息发送流程</h3><p>分布式事务消息发送过程分为三个阶段：<strong>准备阶段、提交/回滚阶段和事务状态检查阶段。</strong></p>
+<h4 id="准备阶段（Prepare-Phase）"><a href="#准备阶段（Prepare-Phase）" class="headerlink" title="准备阶段（Prepare Phase）"></a>准备阶段（Prepare Phase）</h4><p>在这个阶段，消息生产者发送一条<strong>预备消息</strong>（Prepare Message）到 RocketMQ Broker。预备消息会被持久化到 Broker，但<strong>不会被消费者消费</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&gt;<span class="type">TransactionMQProducer</span> <span class="variable">producer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TransactionMQProducer</span>(<span class="string">&quot;ProducerGroupName&quot;</span>);</span><br><span class="line">&gt;producer.setNamesrvAddr(<span class="string">&quot;localhost:9876&quot;</span>);</span><br><span class="line">&gt;producer.start();</span><br><span class="line"></span><br><span class="line">&gt;<span class="comment">// 定义事务监听器</span></span><br><span class="line">&gt;<span class="type">TransactionListener</span> <span class="variable">transactionListener</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TransactionListenerImpl</span>();</span><br><span class="line">&gt;producer.setTransactionListener(transactionListener);</span><br><span class="line"></span><br><span class="line">&gt;<span class="type">Message</span> <span class="variable">msg</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Message</span>(<span class="string">&quot;TopicTest&quot;</span>, <span class="string">&quot;TagA&quot;</span>, (<span class="string">&quot;Hello RocketMQ&quot;</span>).getBytes());</span><br><span class="line">&gt;<span class="type">TransactionSendResult</span> <span class="variable">result</span> <span class="operator">=</span> producer.sendMessageInTransaction(msg, <span class="literal">null</span>);</span><br><span class="line">&gt;System.out.printf(<span class="string">&quot;%s%n&quot;</span>, result);</span><br></pre></td></tr></table></figure>
+<h4 id="提交-回滚阶段（Commit-Rollback-Phase）"><a href="#提交-回滚阶段（Commit-Rollback-Phase）" class="headerlink" title="提交/回滚阶段（Commit/Rollback Phase）"></a>提交/回滚阶段（Commit/Rollback Phase）</h4><p>在本地事务执行完毕后，<strong>生产者</strong>会根据本地事务的执行结果来<strong>提交（Commit）或回滚（Rollback）</strong>之前的预备消息。提交消息会使得消息对消费者可见，而回滚消息则会删除预备消息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&gt;<span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TransactionListenerImpl</span> <span class="keyword">implements</span> <span class="title class_">TransactionListener</span> &#123;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="keyword">public</span> LocalTransactionState <span class="title function_">executeLocalTransaction</span><span class="params">(Message msg, Object arg)</span> &#123;</span><br><span class="line">       <span class="comment">// 执行本地事务逻辑</span></span><br><span class="line">       <span class="type">boolean</span> <span class="variable">success</span> <span class="operator">=</span> executeLocalBusinessLogic();</span><br><span class="line">       <span class="keyword">if</span> (success) &#123;</span><br><span class="line">           <span class="keyword">return</span> LocalTransactionState.COMMIT_MESSAGE;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> LocalTransactionState.ROLLBACK_MESSAGE;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="keyword">public</span> LocalTransactionState <span class="title function_">checkLocalTransaction</span><span class="params">(MessageExt msg)</span> &#123;</span><br><span class="line">       <span class="comment">// 检查本地事务状态</span></span><br><span class="line">       <span class="type">boolean</span> <span class="variable">success</span> <span class="operator">=</span> checkLocalTransactionStatus();</span><br><span class="line">       <span class="keyword">if</span> (success) &#123;</span><br><span class="line">           <span class="keyword">return</span> LocalTransactionState.COMMIT_MESSAGE;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> LocalTransactionState.ROLLBACK_MESSAGE;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&gt;&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="事务状态检查阶段（Transaction-Status-Check-Phase）"><a href="#事务状态检查阶段（Transaction-Status-Check-Phase）" class="headerlink" title="事务状态检查阶段（Transaction Status Check Phase）"></a>事务状态检查阶段（Transaction Status Check Phase）</h4><p>如果在预备消息发送之后，由于网络或其他原因导致生产者未能及时提交或回滚事务，Broker 会定期向生产者询问事务的状态。生产者需要实现<strong>checkLocalTransaction方法</strong>来返回事务的实际状态。</p>
+<h3 id="事务消息的存储和状态管理"><a href="#事务消息的存储和状态管理" class="headerlink" title="事务消息的存储和状态管理"></a>事务消息的存储和状态管理</h3><p>RocketMQ 在 Broker 端会持久化预备消息，并在消息的元数据中记录其状态（准备中、已提交、已回滚）。当生产者提交或回滚事务时，Broker 会更新消息的状态。</p>
+<h3 id="消费者处理事务消息"><a href="#消费者处理事务消息" class="headerlink" title="消费者处理事务消息"></a>消费者处理事务消息</h3><p>消费者在消费消息时，<strong>不会区分事务消息和普通消息</strong>。事务消息在被提交后，消费者才能消费到这些消息。</p>
+<h3 id="事务消息的可靠性保证"><a href="#事务消息的可靠性保证" class="headerlink" title="事务消息的可靠性保证"></a>事务消息的可靠性保证</h3><p><strong>消息持久化</strong>：RocketMQ 对预备消息进行持久化存储，确保消息不会丢失。</p>
+<p><strong>事务状态检查</strong>：通过事务状态检查机制，确保最终事务的一致性。</p>
+<p><strong>重试机制</strong>：在事务消息的各个阶段都有重试机制，确保消息的可靠传递和处理。</p>
+<h4 id="事务消息的示例代码"><a href="#事务消息的示例代码" class="headerlink" title="事务消息的示例代码"></a>事务消息的示例代码</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">&gt;<span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TransactionProducer</span> &#123;</span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MQClientException &#123;</span><br><span class="line">       <span class="type">TransactionMQProducer</span> <span class="variable">producer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TransactionMQProducer</span>(<span class="string">&quot;ProducerGroupName&quot;</span>);</span><br><span class="line">       producer.setNamesrvAddr(<span class="string">&quot;localhost:9876&quot;</span>);</span><br><span class="line">       producer.setTransactionListener(<span class="keyword">new</span> <span class="title class_">TransactionListenerImpl</span>());</span><br><span class="line">       producer.start();</span><br><span class="line"></span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="type">Message</span> <span class="variable">msg</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Message</span>(<span class="string">&quot;TopicTest&quot;</span>, <span class="string">&quot;TagA&quot;</span>, (<span class="string">&quot;Hello RocketMQ&quot;</span>).getBytes());</span><br><span class="line">           <span class="type">TransactionSendResult</span> <span class="variable">result</span> <span class="operator">=</span> producer.sendMessageInTransaction(msg, <span class="literal">null</span>);</span><br><span class="line">           System.out.printf(<span class="string">&quot;%s%n&quot;</span>, result);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (MQClientException e) &#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 保持生产者运行，模拟执行本地事务</span></span><br><span class="line">       Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> <span class="title class_">Thread</span>(producer::shutdown));</span><br><span class="line">   &#125;</span><br><span class="line">&gt;&#125;</span><br><span class="line"></span><br><span class="line">&gt;<span class="keyword">class</span> <span class="title class_">TransactionListenerImpl</span> <span class="keyword">implements</span> <span class="title class_">TransactionListener</span> &#123;</span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="keyword">public</span> LocalTransactionState <span class="title function_">executeLocalTransaction</span><span class="params">(Message msg, Object arg)</span> &#123;</span><br><span class="line">       <span class="comment">// 执行本地事务逻辑</span></span><br><span class="line">       <span class="type">boolean</span> <span class="variable">success</span> <span class="operator">=</span> executeLocalBusinessLogic();</span><br><span class="line">       <span class="keyword">if</span> (success) &#123;</span><br><span class="line">           <span class="keyword">return</span> LocalTransactionState.COMMIT_MESSAGE;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> LocalTransactionState.ROLLBACK_MESSAGE;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="keyword">public</span> LocalTransactionState <span class="title function_">checkLocalTransaction</span><span class="params">(MessageExt msg)</span> &#123;</span><br><span class="line">       <span class="comment">// 检查本地事务状态</span></span><br><span class="line">       <span class="type">boolean</span> <span class="variable">success</span> <span class="operator">=</span> checkLocalTransactionStatus();</span><br><span class="line">       <span class="keyword">if</span> (success) &#123;</span><br><span class="line">           <span class="keyword">return</span> LocalTransactionState.COMMIT_MESSAGE;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> LocalTransactionState.ROLLBACK_MESSAGE;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> <span class="type">boolean</span> <span class="title function_">executeLocalBusinessLogic</span><span class="params">()</span> &#123;</span><br><span class="line">       <span class="comment">// 模拟本地事务执行</span></span><br><span class="line">       <span class="keyword">return</span> <span class="literal">true</span>; <span class="comment">// 返回事务执行结果</span></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> <span class="type">boolean</span> <span class="title function_">checkLocalTransactionStatus</span><span class="params">()</span> &#123;</span><br><span class="line">       <span class="comment">// 模拟检查本地事务状态</span></span><br><span class="line">       <span class="keyword">return</span> <span class="literal">true</span>; <span class="comment">// 返回事务状态</span></span><br><span class="line">   &#125;</span><br><span class="line">&gt;&#125;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h1 id="为什么不应该对所有的message-都使用持久化机制"><a href="#为什么不应该对所有的message-都使用持久化机制" class="headerlink" title="为什么不应该对所有的message 都使用持久化机制"></a>为什么不应该对所有的message 都使用持久化机制</h1><blockquote>
+<h3 id="性能开销"><a href="#性能开销" class="headerlink" title="性能开销"></a>性能开销</h3><p>持久化操作通常涉及磁盘 I/O 操作，而磁盘 I/O 的速度远低于内存操作。频繁的持久化会导致<strong>系统性能下降</strong>，包括消息发送和接收的延迟增加。每次消息持久化都需要写入磁盘，增加了消息发送的延迟。高频率的磁盘 I/O 会限制系统的整体吞吐量。</p>
+<h3 id="资源消耗"><a href="#资源消耗" class="headerlink" title="资源消耗"></a>资源消耗</h3><p>持久化消息需要存储在磁盘上，这会<strong>占用大量的存储空间</strong>。对于高频率、大量的消息传输场景，存储成本会显著增加。大量持久化消息会迅速消耗磁盘空间。</p>
+<h3 id="复杂性和维护成本"><a href="#复杂性和维护成本" class="headerlink" title="复杂性和维护成本"></a>复杂性和维护成本</h3><p>持久化机制增加了系统的复杂性，需要额外的维护和管理。例如，需要定期清理过期的持久化消息，确保磁盘空间的可用性。</p>
+<h3 id="应用场景需求"><a href="#应用场景需求" class="headerlink" title="应用场景需求"></a>应用场景需求</h3><p>并非所有应用场景都需要消息持久化。对于一些实时性要求高但对消息可靠性要求不高的场景，持久化反而会带来不必要的开销。比如<strong>实时性要求高</strong>的场景：如<strong>实时数据流处理、临时通知</strong>等，不需要持久化。又比如<strong>可靠性要求低</strong>的场景：如<strong>缓存更新通知、统计数据</strong>等，丢失少量消息对系统影响不大。</p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://WYH-7.github.io">WYH</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://wyh-7.github.io/posts/186242d5.html">http://wyh-7.github.io/posts/186242d5.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://WYH-7.github.io" target="_blank">WYH</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/MQ/">MQ</a></div><div class="post_share"><div class="social-share" data-image="https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=600" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/posts/c35f27cb.html" title="javaOI"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://images.pexels.com/photos/206359/pexels-photo-206359.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=600" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">javaOI</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">WYH</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">12</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%EF%BC%88%E7%B3%BB%E7%BB%9F%E8%A7%A3%E8%80%A6%E5%92%8C%E6%B5%81%E9%87%8F%E5%89%8A%E5%B3%B0%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">使用场景（系统解耦和流量削峰）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E6%AD%A5%E9%80%9A%E4%BF%A1%E5%9C%BA%E6%99%AF%EF%BC%9A"><span class="toc-number">1.0.1.</span> <span class="toc-text">异步通信场景：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E5%9C%BA%E6%99%AF%EF%BC%9A"><span class="toc-number">1.0.2.</span> <span class="toc-text">分布式系统场景：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E8%80%A6%E7%B3%BB%E7%BB%9F%E5%9C%BA%E6%99%AF%EF%BC%9A"><span class="toc-number">1.0.3.</span> <span class="toc-text">解耦系统场景：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E9%87%8F%E5%89%8A%E5%B3%B0%E5%9C%BA%E6%99%AF%EF%BC%9A"><span class="toc-number">1.0.4.</span> <span class="toc-text">流量削峰场景：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%80%9A%E7%9F%A5%E5%9C%BA%E6%99%AF%EF%BC%9A"><span class="toc-number">1.0.5.</span> <span class="toc-text">消息通知场景：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E5%9C%BA%E6%99%AF%EF%BC%9A"><span class="toc-number">1.0.6.</span> <span class="toc-text">数据同步场景：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BC%BA%E7%82%B9"><span class="toc-number">2.</span> <span class="toc-text">缺点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%A4%8D%E6%9D%82%E6%80%A7%E5%A2%9E%E5%8A%A0"><span class="toc-number">2.0.1.</span> <span class="toc-text">系统复杂性增加</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1%E9%A3%8E%E9%99%A9"><span class="toc-number">2.0.2.</span> <span class="toc-text">消息丢失风险</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%87%8D%E5%A4%8D"><span class="toc-number">2.0.3.</span> <span class="toc-text">消息重复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%B6%E8%BF%9F"><span class="toc-number">2.0.4.</span> <span class="toc-text">延迟</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E7%BB%B4%E6%88%90%E6%9C%AC"><span class="toc-number">2.0.5.</span> <span class="toc-text">运维成本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98"><span class="toc-number">2.0.6.</span> <span class="toc-text">一致性问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-number">3.</span> <span class="toc-text">常见问题与解决方案</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BF%9D%E9%9A%9C%E6%B6%88%E6%81%AF%E7%9A%84%E9%A1%BA%E5%BA%8F%E6%B6%88%E8%B4%B9"><span class="toc-number">4.</span> <span class="toc-text">保障消息的顺序消费</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%A1%BA%E5%BA%8F%E6%B6%88%E8%B4%B9%E9%97%AE%E9%A2%98%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="toc-number">4.0.1.</span> <span class="toc-text">消息顺序消费问题的原因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%B6%88%E6%81%AF%E9%A1%BA%E5%BA%8F%E6%B6%88%E8%B4%B9%E9%97%AE%E9%A2%98%E7%9A%84%E6%96%B9%E6%A1%88"><span class="toc-number">4.0.2.</span> <span class="toc-text">解决消息顺序消费问题的方案</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%81%BF%E5%85%8D%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1"><span class="toc-number">5.</span> <span class="toc-text">避免消息丢失</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E7%94%9F%E4%BA%A7%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%BF%9D%E8%AF%81"><span class="toc-number">5.0.1.</span> <span class="toc-text">消息生产过程中的可靠性保证:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E4%BC%A0%E8%BE%93%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%BF%9D%E8%AF%81"><span class="toc-number">5.0.2.</span> <span class="toc-text">消息传输过程中的可靠性保证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%BF%9D%E8%AF%81"><span class="toc-number">5.0.3.</span> <span class="toc-text">消息存储过程中的可靠性保证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E6%B6%88%E8%B4%B9%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%BF%9D%E8%AF%81"><span class="toc-number">5.0.4.</span> <span class="toc-text">消息消费过程中的可靠性保证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">5.0.5.</span> <span class="toc-text">其他注意事项</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%81%BF%E5%85%8D%E6%B6%88%E6%81%AF%E9%87%8D%E5%A4%8D%E6%8A%95%E9%80%92%E6%88%96%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9"><span class="toc-number">6.</span> <span class="toc-text">避免消息重复投递或重复消费</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E5%B9%82%E7%AD%89%E6%80%A7"><span class="toc-number">6.0.1.</span> <span class="toc-text">消息幂等性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E6%8A%95%E9%80%92%E6%9C%BA%E5%88%B6"><span class="toc-number">6.0.2.</span> <span class="toc-text">消息投递机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E8%B4%B9%E8%BF%9B%E5%BA%A6%E7%AE%A1%E7%90%86"><span class="toc-number">6.0.3.</span> <span class="toc-text">消费进度管理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="toc-number">7.</span> <span class="toc-text">消息重复消费的原因</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E5%92%8C%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97"><span class="toc-number">8.</span> <span class="toc-text">死信队列和延迟队列</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%EF%BC%88DLQ%EF%BC%89"><span class="toc-number">8.0.1.</span> <span class="toc-text">死信队列（DLQ）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">8.0.1.1.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="toc-number">8.0.1.2.</span> <span class="toc-text">实现方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97"><span class="toc-number">8.0.2.</span> <span class="toc-text">延迟队列</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="toc-number">8.0.2.1.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95-1"><span class="toc-number">8.0.2.2.</span> <span class="toc-text">实现方法</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%9A%84%E5%BB%B6%E6%97%B6%E4%BB%A5%E5%8F%8A%E8%BF%87%E6%9C%9F%E5%A4%B1%E6%95%88%E9%97%AE%E9%A2%98"><span class="toc-number">9.</span> <span class="toc-text">解决消息队列的延时以及过期失效问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%9A%84%E5%BB%B6%E6%97%B6%E9%97%AE%E9%A2%98"><span class="toc-number">9.0.1.</span> <span class="toc-text">解决消息队列的延时问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%B6%88%E6%81%AF%E8%BF%87%E6%9C%9F%E5%A4%B1%E6%95%88%E9%97%AE%E9%A2%98"><span class="toc-number">9.0.2.</span> <span class="toc-text">解决消息过期失效问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%B6%88%E6%81%AF%E7%A7%AF%E5%8E%8B%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">10.</span> <span class="toc-text">解决消息积压的问题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%E6%9C%89%E4%BB%80%E4%B9%88%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="toc-number">11.</span> <span class="toc-text">Kafka、ActiveMQ、RabbitMQ、RocketMQ有什么优缺点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Apache-Kafka"><span class="toc-number">11.0.1.</span> <span class="toc-text">Apache Kafka</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E7%82%B9"><span class="toc-number">11.0.1.1.</span> <span class="toc-text">优点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%BA%E7%82%B9-1"><span class="toc-number">11.0.1.2.</span> <span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ActiveMQ"><span class="toc-number">11.0.2.</span> <span class="toc-text">ActiveMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E7%82%B9-1"><span class="toc-number">11.0.2.1.</span> <span class="toc-text">优点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%BA%E7%82%B9-2"><span class="toc-number">11.0.2.2.</span> <span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RabbitMQ"><span class="toc-number">11.0.3.</span> <span class="toc-text">RabbitMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E7%82%B9-2"><span class="toc-number">11.0.3.1.</span> <span class="toc-text">优点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%BA%E7%82%B9-3"><span class="toc-number">11.0.3.2.</span> <span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Apache-RocketMQ"><span class="toc-number">11.0.4.</span> <span class="toc-text">Apache RocketMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E7%82%B9-3"><span class="toc-number">11.0.4.1.</span> <span class="toc-text">优点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%BA%E7%82%B9-4"><span class="toc-number">11.0.4.2.</span> <span class="toc-text">缺点</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RocketMQ%E6%B6%88%E8%B4%B9%E6%A8%A1%E5%BC%8F%E6%9C%89%E5%87%A0%E7%A7%8D"><span class="toc-number">12.</span> <span class="toc-text">RocketMQ消费模式有几种</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E6%B6%88%E8%B4%B9"><span class="toc-number">12.0.1.</span> <span class="toc-text">集群消费</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%BF%E6%92%AD%E6%B6%88%E8%B4%B9"><span class="toc-number">12.0.2.</span> <span class="toc-text">广播消费</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RocketMQ%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E4%B8%8D%E4%B8%A2%E5%A4%B1"><span class="toc-number">13.</span> <span class="toc-text">RocketMQ如何保证消息不丢失</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-number">13.0.1.</span> <span class="toc-text">消息持久化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6"><span class="toc-number">13.0.2.</span> <span class="toc-text">主从复制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E7%A1%AE%E8%AE%A4%E6%9C%BA%E5%88%B6"><span class="toc-number">13.0.3.</span> <span class="toc-text">消息确认机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E8%AF%95%E6%9C%BA%E5%88%B6"><span class="toc-number">13.0.4.</span> <span class="toc-text">重试机制</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RocketMQ%E5%A6%82%E4%BD%95%E5%81%9A%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="toc-number">14.</span> <span class="toc-text">RocketMQ如何做负载均衡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%AD%96%E7%95%A5"><span class="toc-number">14.0.1.</span> <span class="toc-text">负载均衡策略</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B9%B3%E5%9D%87%E5%88%86%E9%85%8D%EF%BC%88AllocateMessageQueueAveragely%EF%BC%89"><span class="toc-number">14.0.1.1.</span> <span class="toc-text">平均分配（AllocateMessageQueueAveragely）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%89%E7%8E%AF%E5%BD%A2%E5%88%86%E9%85%8D%EF%BC%88AllocateMessageQueueByCircle%EF%BC%89"><span class="toc-number">14.0.1.2.</span> <span class="toc-text">按环形分配（AllocateMessageQueueByCircle）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%88%86%E9%85%8D%E7%AD%96%E7%95%A5"><span class="toc-number">14.0.1.3.</span> <span class="toc-text">自定义分配策略</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E8%BF%87%E7%A8%8B"><span class="toc-number">14.0.2.</span> <span class="toc-text">负载均衡过程</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RocketMQ%E5%9C%A8%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E4%B8%8B%E7%9A%84%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86"><span class="toc-number">15.</span> <span class="toc-text">RocketMQ在分布式事务下的底层原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF%E5%8F%91%E9%80%81%E6%B5%81%E7%A8%8B"><span class="toc-number">15.0.1.</span> <span class="toc-text">事务消息发送流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E9%98%B6%E6%AE%B5%EF%BC%88Prepare-Phase%EF%BC%89"><span class="toc-number">15.0.1.1.</span> <span class="toc-text">准备阶段（Prepare Phase）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%90%E4%BA%A4-%E5%9B%9E%E6%BB%9A%E9%98%B6%E6%AE%B5%EF%BC%88Commit-Rollback-Phase%EF%BC%89"><span class="toc-number">15.0.1.2.</span> <span class="toc-text">提交&#x2F;回滚阶段（Commit&#x2F;Rollback Phase）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E7%8A%B6%E6%80%81%E6%A3%80%E6%9F%A5%E9%98%B6%E6%AE%B5%EF%BC%88Transaction-Status-Check-Phase%EF%BC%89"><span class="toc-number">15.0.1.3.</span> <span class="toc-text">事务状态检查阶段（Transaction Status Check Phase）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF%E7%9A%84%E5%AD%98%E5%82%A8%E5%92%8C%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86"><span class="toc-number">15.0.2.</span> <span class="toc-text">事务消息的存储和状态管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E8%B4%B9%E8%80%85%E5%A4%84%E7%90%86%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF"><span class="toc-number">15.0.3.</span> <span class="toc-text">消费者处理事务消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF%E7%9A%84%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%BF%9D%E8%AF%81"><span class="toc-number">15.0.4.</span> <span class="toc-text">事务消息的可靠性保证</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF%E7%9A%84%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="toc-number">15.0.4.1.</span> <span class="toc-text">事务消息的示例代码</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E5%BA%94%E8%AF%A5%E5%AF%B9%E6%89%80%E6%9C%89%E7%9A%84message-%E9%83%BD%E4%BD%BF%E7%94%A8%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%BA%E5%88%B6"><span class="toc-number">16.</span> <span class="toc-text">为什么不应该对所有的message 都使用持久化机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E5%BC%80%E9%94%80"><span class="toc-number">16.0.1.</span> <span class="toc-text">性能开销</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B5%84%E6%BA%90%E6%B6%88%E8%80%97"><span class="toc-number">16.0.2.</span> <span class="toc-text">资源消耗</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%8D%E6%9D%82%E6%80%A7%E5%92%8C%E7%BB%B4%E6%8A%A4%E6%88%90%E6%9C%AC"><span class="toc-number">16.0.3.</span> <span class="toc-text">复杂性和维护成本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E9%9C%80%E6%B1%82"><span class="toc-number">16.0.4.</span> <span class="toc-text">应用场景需求</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/186242d5.html" title="MQ"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=600" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="MQ"/></a><div class="content"><a class="title" href="/posts/186242d5.html" title="MQ">MQ</a><time datetime="2025-04-21T13:27:37.000Z" title="发表于 2025-04-21 21:27:37">2025-04-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/c35f27cb.html" title="javaOI"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://images.pexels.com/photos/206359/pexels-photo-206359.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=600" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="javaOI"/></a><div class="content"><a class="title" href="/posts/c35f27cb.html" title="javaOI">javaOI</a><time datetime="2025-04-18T14:03:29.000Z" title="发表于 2025-04-18 22:03:29">2025-04-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/da3e1361.html" title="Mybatis"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://images.pexels.com/photos/618833/pexels-photo-618833.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=600" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Mybatis"/></a><div class="content"><a class="title" href="/posts/da3e1361.html" title="Mybatis">Mybatis</a><time datetime="2025-04-16T05:57:37.000Z" title="发表于 2025-04-16 13:57:37">2025-04-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/6c92115f.html" title="Spring"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=600" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Spring"/></a><div class="content"><a class="title" href="/posts/6c92115f.html" title="Spring">Spring</a><time datetime="2025-04-15T14:28:51.000Z" title="发表于 2025-04-15 22:28:51">2025-04-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/66c016fb.html" title="JVM"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://images.pexels.com/photos/640947/pexels-photo-640947.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=600" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JVM"/></a><div class="content"><a class="title" href="/posts/66c016fb.html" title="JVM">JVM</a><time datetime="2025-04-15T14:24:51.000Z" title="发表于 2025-04-15 22:24:51">2025-04-15</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By WYH</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/metingjs/dist/Meting.min.js"></script><div class="app-refresh" id="app-refresh" style="position: fixed;top: -2.2rem;left: 0;right: 0;z-index: 99999;padding: 0 1rem;font-size: 15px;height: 2.2rem;transition: all 0.3s ease;"><div class="app-refresh-wrap" style=" display: flex;color: #fff;height: 100%;align-items: center;justify-content: center;"><label>✨ 有新文章啦！ 👉</label><a href="javascript:void(0)" onclick="location.reload()"><span style="color: #fff;text-decoration: underline;cursor: pointer;">🍗点击食用🍔</span></a></div></div><script>if ('serviceWorker' in navigator) {
+if (navigator.serviceWorker.controller) {
+navigator.serviceWorker.addEventListener('controllerchange', function() {
+showNotification()
+})
+}
+window.addEventListener('load', function() {
+navigator.serviceWorker.register('/sw.js')
+})
+}
+function showNotification() {
+if (GLOBAL_CONFIG.Snackbar) {
+var snackbarBg =
+document.documentElement.getAttribute('data-theme') === 'light' ?
+GLOBAL_CONFIG.Snackbar.bgLight :
+GLOBAL_CONFIG.Snackbar.bgDark
+var snackbarPos = GLOBAL_CONFIG.Snackbar.position
+Snackbar.show({
+text: '✨ 有新文章啦！ 👉',
+backgroundColor: snackbarBg,
+duration: 500000,
+pos: snackbarPos,
+actionText: '🍗点击食用🍔',
+actionTextColor: '#fff',
+onActionClick: function(e) {
+location.reload()
+},
+})
+} else {
+var showBg =
+document.documentElement.getAttribute('data-theme') === 'light' ?
+'#3b70fc' :
+'#1f1f1f'
+var cssText = `top: 0; background: ${showBg};`
+document.getElementById('app-refresh').style.cssText = cssText
+}
+}</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div><!-- hexo injector body_end start --><script data-pjax>
+  function butterfly_clock_anzhiyu_injector_config(){
+    var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+    var item_html = '<div class="card-widget card-clock"><div class="card-glass"><div class="card-background"><div class="card-content"><div id="hexo_electric_clock"><img class="entered loading" id="card-clock-loading" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu@1.1.6/lib/loading.gif" style="height: 120px; width: 100%;" data-ll-status="loading"/></div></div></div></div></div>';
+    console.log('已挂载butterfly_clock_anzhiyu')
+    if(parent_div_git) {
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var qweather_key = 'b16a1fa0e63c46a4b8f28abfb06ae3fe';
+  var gaud_map_key = 'e2b04289e870b005374ee030148d64fd&s=rsv3';
+  var baidu_ak_key = 'undefined';
+  var flag = 0;
+  var clock_rectangle = '112.6534116,27.96920845';
+  var clock_default_rectangle_enable = 'false';
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  </script><script src="https://widget.qweather.net/simple/static/js/he-simple-common.js?v=2.0"></script><script data-pjax src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu@1.1.6/lib/clock.min.js"></script><script data-pjax>
+  function butterfly_footer_beautify_injector_config(){
+    var parent_div_git = document.getElementById('footer-wrap');
+    var item_html = '<div id="workboard"></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="博客框架为Hexo_v5.4.0" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&amp;logo=hexo" alt=""/></a><a class="github-badge" target="_blank" href="https://butterfly.js.org/" style="margin-inline:5px" data-title="主题版本Butterfly_v4.2.2" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&amp;logo=bitdefender" alt=""/></a><a class="github-badge" target="_blank" href="https://www.jsdelivr.com/" style="margin-inline:5px" data-title="本站使用JsDelivr为静态资源提供CDN加速" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&amp;logo=jsDelivr" alt=""/></a><a class="github-badge" target="_blank" href="https://github.com/" style="margin-inline:5px" data-title="本站项目由Github托管" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&amp;logo=GitHub" alt=""/></a><a class="github-badge" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" style="margin-inline:5px" data-title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&amp;logo=Claris" alt=""/></a></p>';
+    console.log('已挂载butterfly_footer_beautify')
+    parent_div_git.insertAdjacentHTML("beforeend",item_html)
+    }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_footer_beautify_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_footer_beautify_injector_config();
+  }
+  </script><script async src="/./js/runtime/runtime.js"></script><script async src="/js/ali_font.js"></script><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '30');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('article-sort-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__slideInRight');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"scriptFremo":"local","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","with":150,"heigth":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/"});</script></body></html>
